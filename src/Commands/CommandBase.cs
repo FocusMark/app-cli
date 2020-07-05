@@ -1,7 +1,9 @@
-﻿using FocusMark.App.Cli.Services;
+﻿using FocusMark.App.Cli.Commands.AuthCommands;
+using FocusMark.App.Cli.Services;
 using McMaster.Extensions.CommandLineUtils;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace FocusMark.App.Cli.Commands
@@ -24,10 +26,11 @@ namespace FocusMark.App.Cli.Commands
             this.Logger.LogInformation("Checking for authorization");
             bool isUserAuthorized = await this.AuthorizationService.IsUserAuthorized();
 
-            if (!isUserAuthorized && app.Name != "login")
+            if (!isUserAuthorized && this.GetType().GetCustomAttribute<UnauthorizedAttribute>() == null)
             {
                 this.Logger.LogError("User is not logged into an account. CLI will abort.");
                 this.WriteErrorToConsole("You must be logged in first.");
+                app.ShowHelp();
                 return 1;
             }
 

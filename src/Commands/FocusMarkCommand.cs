@@ -12,7 +12,8 @@ namespace FocusMark.App.Cli.Commands
     [Command(Name = "fm", FullName = "focusmark", UnrecognizedArgumentHandling = UnrecognizedArgumentHandling.Throw, OptionsComparison = StringComparison.InvariantCultureIgnoreCase)]
     [VersionOptionFromMember("--version", MemberName = nameof(CommandVersion))]
     [Subcommand(
-        typeof(LoginCommand))]
+        typeof(LoginCommand),
+        typeof(LogoutCommand))]
     public class FocusMarkCommand : CommandBase
     {
         public FocusMarkCommand(IConsole console, ILogger<FocusMarkCommand> logger, IAuthorizationService authorizationService)

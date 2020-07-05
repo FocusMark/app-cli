@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace FocusMark.App.Cli.Commands.AuthCommands
 {
+    [Unauthorized]
     [Command(Name = "login", Description = "Logs into your FocusMark account", UnrecognizedArgumentHandling = UnrecognizedArgumentHandling.Throw, OptionsComparison = StringComparison.InvariantCultureIgnoreCase)]
     public class LoginCommand : CommandBase
     {
