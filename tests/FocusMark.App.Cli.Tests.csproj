@@ -18,7 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\FocusMark.App.Cli.csproj" />
+    <ProjectReference Include="..\src\FocusMark.App.Cli.csproj" />
   </ItemGroup>
 
 </Project>
