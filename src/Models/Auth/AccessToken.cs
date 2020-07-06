@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace FocusMark.App.Cli.Models
+namespace FocusMark.App.Cli.Models.Auth
 {
     public class AccessToken
     {

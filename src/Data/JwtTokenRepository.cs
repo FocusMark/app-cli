@@ -3,6 +3,7 @@ using LiteDB;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 
 namespace FocusMark.App.Cli.Data
@@ -32,6 +33,11 @@ namespace FocusMark.App.Cli.Data
 
         public Task SaveTokens(JwtTokens tokens)
         {
+            if (tokens is null || string.IsNullOrEmpty(tokens.AccessToken) || string.IsNullOrEmpty(tokens.IdToken) || string.IsNullOrEmpty(tokens.RefreshToken))
+            {
+                throw new ArgumentNullException(nameof(tokens));
+            }
+
             JwtTokens protectedTokens = this.ProtectTokens(tokens);
             ILiteDatabase database = this.databaseFactory.GetDatabase(DatabaseName);
             using (database)
@@ -72,20 +78,31 @@ namespace FocusMark.App.Cli.Data
             }
 
             // Unprotect the tokens and return them.
-            JwtTokens unprotectedTokens = this.UnprotectTokens(protectedTokens);
-            return Task.FromResult(unprotectedTokens);
+            try
+            {
+                JwtTokens unprotectedTokens = this.UnprotectTokens(protectedTokens);
+                return Task.FromResult(unprotectedTokens);
+            }
+            catch (CryptographicException)
+            {
+                this.logger.LogError("Failed to unprotect tokens. Potentially tampered with.");
+                return Task.FromResult<JwtTokens>(null);
+            }
         }
 
         private JwtTokens ProtectTokens(JwtTokens jwtTokens)
         {
             IDataProtector authProtector = this.protectionProvider.CreateProtector(TokenProtector);
 
+            // Protect Access Token with a unique protector
             IDataProtector accessTokenProtector = authProtector.CreateProtector(AccessTokenProtector);
             string encryptedAccessToken = accessTokenProtector.Protect(jwtTokens.AccessToken);
 
+            // Protect Id Token with a unique protector
             IDataProtector idTokenProtector = authProtector.CreateProtector(IdTokenProtector);
             string encryptedIdToken = idTokenProtector.Protect(jwtTokens.IdToken);
 
+            // Protect Refresh Token with a unique protector
             IDataProtector refreshTokenProtector = authProtector.CreateProtector(RefreshTokenProtector);
             string encryptedRefreshToken = refreshTokenProtector.Protect(jwtTokens.RefreshToken);
 

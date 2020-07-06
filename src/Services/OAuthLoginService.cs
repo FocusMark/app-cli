@@ -15,7 +15,6 @@ namespace FocusMark.App.Cli.Services
     public class OAuthLoginService : ILoginService
     {
         // OAuth fields
-        private const string client = "5qrnpscs2elifc3j0635ojan52";
         private const string authFlow = "code";
         private const string redirectUri = "http://localhost:9000";
 
@@ -65,7 +64,7 @@ namespace FocusMark.App.Cli.Services
             string[] requestedScopes = new string[] { AuthorizationScopes.OpenId, AuthorizationScopes.ApiProjectRead, AuthorizationScopes.ApiProjectWrite };
             string flattenedScopes = string.Join('+', requestedScopes);
 
-            string url = $"{this.authConfiguration.AuthUrl}/{this.authConfiguration.LoginPath}?client_id={client}&response_type={authFlow}&scope={flattenedScopes}&redirect_uri={redirectUri}";
+            string url = $"{this.authConfiguration.AuthUrl}/{this.authConfiguration.LoginPath}?client_id={this.authConfiguration.ClientId}&response_type={authFlow}&scope={flattenedScopes}&redirect_uri={redirectUri}";
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 url = url.Replace("&", "^&");
@@ -87,12 +86,14 @@ namespace FocusMark.App.Cli.Services
         private async Task<JwtTokens> RequestJwtTokens(string authCode)
         {
             HttpClient httpClient = this.clientFactory.CreateClient("Jwt Token Request");
-            var codeContent = new KeyValuePair<string, string>("code", authCode);
-            var grantTypeContent = new KeyValuePair<string, string>("grant_type", "authorization_code");
-            var clientIdContent = new KeyValuePair<string, string>("client_id", client);
-            var redirectUriContent = new KeyValuePair<string, string>("redirect_uri", redirectUri);
+
             var bodyContent = new List<KeyValuePair<string, string>>()
-                { codeContent, grantTypeContent, clientIdContent, redirectUriContent, };
+            { 
+                new KeyValuePair<string, string>("code", authCode),
+                new KeyValuePair<string, string>("grant_type", "authorization_code"),
+                new KeyValuePair<string, string>("client_id", this.authConfiguration.ClientId),
+                new KeyValuePair<string, string>("redirect_uri", redirectUri), 
+            };
 
             var body = new FormUrlEncodedContent(bodyContent);
             var authResponse = await httpClient.PostAsync($"{this.authConfiguration.AuthUrl}/oauth2/token/", body);
@@ -103,7 +104,7 @@ namespace FocusMark.App.Cli.Services
 
         private async Task RespondWithFailedLogin(HttpListenerContext requestContext)
         {
-            byte[] failedBuffer = Encoding.UTF8.GetBytes("<html><body>FocusMark failed to log you in.");
+            byte[] failedBuffer = Encoding.UTF8.GetBytes("<html><body>FocusMark failed to log you in.</body></html>");
 
             requestContext.Response.StatusCode = 500;
             requestContext.Response.ContentLength64 = failedBuffer.Length;
@@ -114,7 +115,7 @@ namespace FocusMark.App.Cli.Services
 
         private async Task RespondWithSuccessfulLogin(HttpListenerContext requestContext)
         {
-            byte[] sucessBuffer = Encoding.UTF8.GetBytes("<html><body>FocusMark Login Completed.");
+            byte[] sucessBuffer = Encoding.UTF8.GetBytes("<html><body>FocusMark Login Completed.</body></html>");
 
             requestContext.Response.StatusCode = 200;
             requestContext.Response.ContentLength64 = sucessBuffer.Length;

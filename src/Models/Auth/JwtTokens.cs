@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using FocusMark.App.Cli.Models.Auth;
+using Newtonsoft.Json;
 using System;
 using System.Text;
 

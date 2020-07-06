@@ -8,10 +8,15 @@ namespace FocusMark.App.Cli
     {
         public static IServiceCollection AddCliServices(this IServiceCollection services)
         {
+            // Services
             services.AddSingleton<IAuthorizationService, OAuthAuthorizationService>();
             services.AddSingleton<ILoginService, OAuthLoginService>();
+            services.AddSingleton<IProjectService, ProjectService>();
+
+            // Data
             services.AddSingleton<ITokenRepository, JwtTokenRepository>();
             services.AddSingleton<IDatabaseFactory, LiteDatabaseFactory>();
+
             return services;
         }
     }

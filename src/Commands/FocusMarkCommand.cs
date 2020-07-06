@@ -1,19 +1,20 @@
 ﻿using FocusMark.App.Cli.Commands.AuthCommands;
+using FocusMark.App.Cli.Commands.ProjectCommands;
 using FocusMark.App.Cli.Services;
 using McMaster.Extensions.CommandLineUtils;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Diagnostics;
-using System.Reflection;
 using System.Threading.Tasks;
 
 namespace FocusMark.App.Cli.Commands
 {
     [Command(Name = "fm", FullName = "focusmark", UnrecognizedArgumentHandling = UnrecognizedArgumentHandling.Throw, OptionsComparison = StringComparison.InvariantCultureIgnoreCase)]
+    [Unauthorized]
     [VersionOptionFromMember("--version", MemberName = nameof(CommandVersion))]
     [Subcommand(
         typeof(LoginCommand),
-        typeof(LogoutCommand))]
+        typeof(LogoutCommand),
+        typeof(ProjectCommand))]
     public class FocusMarkCommand : CommandBase
     {
         public FocusMarkCommand(IConsole console, ILogger<FocusMarkCommand> logger, IAuthorizationService authorizationService)
@@ -21,7 +22,7 @@ namespace FocusMark.App.Cli.Commands
         {
         }
 
-        public string CommandVersion => FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion;
+        public string CommandVersion => "0.0.1";
 
         protected override Task<int> Execute(CommandLineApplication app)
         {

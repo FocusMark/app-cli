@@ -16,10 +16,8 @@ namespace FocusMark.App.Cli
     {
         static async Task<int> Main(string[] args)
         {
-            // Deserialize data from API calls onto Domain models with private setters
-            JsonConvert.DefaultSettings = () => new JsonSerializerSettings { ContractResolver = new NonPublicPropertiesResolver() };
-
             IHostBuilder builder = new HostBuilder();
+
             builder.ConfigureAppConfiguration(configBuilder =>
             {
                 configBuilder.SetBasePath(Directory.GetCurrentDirectory())
@@ -30,8 +28,10 @@ namespace FocusMark.App.Cli
                     .ReadFrom.Configuration(configBuilder.Build())
                     .Enrich.FromLogContext()
                     .CreateLogger();
+            }).ConfigureServices((hostContext, services) =>
+            {
+                ConfigureServices(services, hostContext.Configuration);
             });
-            builder.ConfigureServices((hostContext, services) => ConfigureServices(services, hostContext.Configuration));
 
             try
             {
