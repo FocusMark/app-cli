@@ -24,7 +24,17 @@ namespace FocusMark.App.Cli.Commands.ProjectCommands
         [Required]
         public string Title { get; set; }
 
+        [Option("-p|--path", CommandOptionType.SingleOrNoValue, Description = "The path in the Project nesting hierarchy.")]
         public string Path { get; set; } = "/";
+
+        [Option("-sd|--start-date", CommandOptionType.SingleOrNoValue, Description = "The date that the Project will start on.")]
+        public DateTime? StartDate { get; set; }
+
+        [Option("-td|--target-date", CommandOptionType.SingleOrNoValue, Description = "The date that the Project is targeting for completion.")]
+        public DateTime? TargetDate { get; set; }
+
+        [Option("-k|--kind", CommandOptionType.SingleOrNoValue, Description = "The methodology kind that the Project will use. Allowed values currently are 'Kanban'")]
+        public string Kind { get; set; } = "Kanban";
 
         protected override async Task<int> Execute(CommandLineApplication app)
         {
