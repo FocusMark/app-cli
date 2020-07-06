@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "FocusMark.App.Cli": {
+      "commandName": "Project",
+      "commandLineArgs": "login"
+    }
+  }
+}
