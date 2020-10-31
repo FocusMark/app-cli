@@ -13,7 +13,7 @@ namespace FocusMark.App.Cli.Commands.ProjectCommands
         typeof(CreateProjectCommand))]
     public class ProjectCommand : CommandBase
     {
-        public ProjectCommand(IConsole console, ILogger logger, IAuthorizationService authorizationService) 
+        public ProjectCommand(IConsole console, ILogger<ProjectCommand> logger, IAuthorizationService authorizationService) 
             : base(console, logger, authorizationService)
         {
         }

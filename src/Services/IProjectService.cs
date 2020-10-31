@@ -6,6 +6,6 @@ namespace FocusMark.App.Cli.Services
 {
     public interface IProjectService
     {
-        Task<ApiResponse<string>> CreateProject(CreateProjectRequest createRequest);
+        Task<ApiResponse<CreateProjectResponse>> CreateProject(CreateProjectRequest createRequest);
     }
 }

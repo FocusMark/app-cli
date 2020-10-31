@@ -30,7 +30,7 @@ namespace FocusMark.App.Cli.Services
             configuration.GetSection("FocusMark").Bind(this.apiConfiguration);
         }
 
-        public async Task<ApiResponse<string>> CreateProject(CreateProjectRequest createRequest)
+        public async Task<ApiResponse<CreateProjectResponse>> CreateProject(CreateProjectRequest createRequest)
         {
             JwtTokens jwtTokens = await this.authorizationService.GetTokens();
 
@@ -46,10 +46,15 @@ namespace FocusMark.App.Cli.Services
 
             HttpResponseMessage postResponse = await httpClient.PostAsync(apiUrl, httpBody);
             string jsonPayload = await postResponse.Content.ReadAsStringAsync();
-            if (postResponse.StatusCode == HttpStatusCode.Accepted)
+            if (postResponse.StatusCode == HttpStatusCode.Created)
+            {
+                ApiResponse<CreateProjectResponse> apiResponse = JsonConvert.DeserializeObject<ApiResponse<CreateProjectResponse>>(jsonPayload);
+                return apiResponse;
+            }
+            else if (postResponse.StatusCode == HttpStatusCode.UnprocessableEntity)
             {
                 ApiResponse<string> apiResponse = JsonConvert.DeserializeObject<ApiResponse<string>>(jsonPayload);
-                return apiResponse;
+                throw new InvalidModelException<string>(apiResponse);
             }
             else if (postResponse.StatusCode == HttpStatusCode.Unauthorized)
             {
